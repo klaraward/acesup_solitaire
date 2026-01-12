@@ -235,6 +235,17 @@ h1 {
     background-color: #e74c3c;
 }
 
+#restart-btn:disabled {
+    background-color: #666;
+    cursor: not-allowed;
+}
+
+.quota-info {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
 /* Tom plats när ett kort är valt */
 .card-slot.empty:hover {
     background-color: rgba(100, 200, 255, 0.2);

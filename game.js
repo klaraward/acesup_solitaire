@@ -12,6 +12,57 @@ let selectedSlot = null;
 let gameOver = false;
 let hintsEnabled = true;
 
+// Kvot-hantering
+const DAILY_QUOTA = 10;
+const UNLIMITED_PARAM = 'unlimited';
+
+function isUnlimitedMode() {
+    const params = new URLSearchParams(window.location.search);
+    return params.has(UNLIMITED_PARAM);
+}
+
+function getTodayKey() {
+    return 'gamesPlayed_' + new Date().toISOString().split('T')[0];
+}
+
+function getGamesPlayedToday() {
+    if (isUnlimitedMode()) return 0;
+    return parseInt(localStorage.getItem(getTodayKey()) || '0', 10);
+}
+
+function incrementGamesPlayed() {
+    if (isUnlimitedMode()) return;
+    const count = getGamesPlayedToday() + 1;
+    localStorage.setItem(getTodayKey(), count.toString());
+    updateQuotaDisplay();
+}
+
+function hasQuotaLeft() {
+    if (isUnlimitedMode()) return true;
+    return getGamesPlayedToday() < DAILY_QUOTA;
+}
+
+function updateQuotaDisplay() {
+    const quotaEl = document.getElementById('quota-display');
+    if (!quotaEl) return;
+
+    if (isUnlimitedMode()) {
+        quotaEl.textContent = 'Obegränsat läge';
+    } else {
+        const played = getGamesPlayedToday();
+        const left = Math.max(0, DAILY_QUOTA - played);
+        quotaEl.textContent = `${left} spel kvar idag`;
+    }
+}
+
+function showQuotaExceeded() {
+    const statusEl = document.getElementById('status');
+    statusEl.innerHTML = '<strong>Du har spelat klart för idag! Kom tillbaka imorgon.</strong>';
+    statusEl.classList.add('game-over');
+    document.getElementById('deck').style.cursor = 'default';
+    document.getElementById('restart-btn').disabled = true;
+}
+
 // Skapa en blandad kortlek
 function createDeck() {
     deck = [];
@@ -309,10 +360,17 @@ function handleSlotClick(slotIndex) {
 
 // Starta om spelet
 function restartGame() {
+    if (!hasQuotaLeft()) {
+        showQuotaExceeded();
+        return;
+    }
+
     gameOver = false;
     selectedSlot = null;
     slots = [[], [], [], []];
     document.getElementById('status').classList.remove('game-over');
+    document.getElementById('restart-btn').disabled = false;
+    incrementGamesPlayed();
     createDeck();
     renderDeck();
     renderSlots();
@@ -335,6 +393,14 @@ document.getElementById('hints-toggle').addEventListener('change', (e) => {
 
 // Initiera spelet
 function initGame() {
+    updateQuotaDisplay();
+
+    if (!hasQuotaLeft()) {
+        showQuotaExceeded();
+        return;
+    }
+
+    incrementGamesPlayed();
     createDeck();
     renderDeck();
     renderSlots();
