@@ -263,3 +263,73 @@ h1 {
     margin-bottom: 8px;
     line-height: 1.4;
 }
+
+/* Responsiv layout för små skärmar */
+@media (max-width: 480px) {
+    body {
+        padding-top: 20px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+
+    .card-slots {
+        gap: 8px;
+        margin-bottom: 25px;
+    }
+
+    .card-slot {
+        width: 80px;
+        min-height: 112px;
+    }
+
+    .card-pile {
+        width: 80px;
+    }
+
+    .card-pile .card {
+        margin-bottom: -80px;
+    }
+
+    .deck {
+        width: 80px;
+        height: 112px;
+    }
+
+    .card {
+        width: 80px;
+        height: 112px;
+        border-radius: 8px;
+    }
+
+    .card.front {
+        padding: 5px;
+    }
+
+    .card .rank {
+        font-size: 1rem;
+    }
+
+    .card .suit {
+        font-size: 0.85rem;
+    }
+
+    .card .center-suit {
+        font-size: 2rem;
+    }
+
+    .rules {
+        padding: 15px;
+        margin-top: 25px;
+    }
+
+    .rules h2 {
+        font-size: 1.1rem;
+    }
+
+    .rules li {
+        font-size: 0.9rem;
+    }
+}
