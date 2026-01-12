@@ -10,6 +10,7 @@ let deck = [];
 let slots = [[], [], [], []]; // Varje slot är nu en hög med kort
 let selectedSlot = null;
 let gameOver = false;
+let hintsEnabled = true;
 
 // Skapa en blandad kortlek
 function createDeck() {
@@ -102,8 +103,8 @@ function renderSlots() {
                         cardEl.classList.add('selected');
                     }
 
-                    // Markera kort som kan tas bort (endast översta)
-                    if (canBeRemoved(i)) {
+                    // Markera kort som kan tas bort (endast översta, om hints är på)
+                    if (hintsEnabled && canBeRemoved(i)) {
                         cardEl.classList.add('removable');
                     }
                 }
@@ -326,6 +327,11 @@ for (let i = 0; i < 4; i++) {
 }
 
 document.getElementById('restart-btn').addEventListener('click', restartGame);
+
+document.getElementById('hints-toggle').addEventListener('change', (e) => {
+    hintsEnabled = e.target.checked;
+    renderSlots();
+});
 
 // Initiera spelet
 function initGame() {

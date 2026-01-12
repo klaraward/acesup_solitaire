@@ -57,7 +57,7 @@ h1 {
 
 .card-pile .card {
     position: relative;
-    margin-bottom: -110px; /* Överlappa kort, visa övre delen */
+    margin-bottom: -100px; /* Överlappa kort, visa valör och svit */
 }
 
 .card-pile .card:last-child {
@@ -189,6 +189,23 @@ h1 {
 /* Kontroller */
 .controls {
     color: white;
+}
+
+.options {
+    margin-bottom: 15px;
+}
+
+.options label {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.options input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 }
 
 #status {
