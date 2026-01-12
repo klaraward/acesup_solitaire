@@ -301,6 +301,97 @@
             expect(hasQuotaLeft()).toBe(true);
         });
 
+        // === hasPerfectPosition tester ===
+        resultsEl.innerHTML += '<h2>hasPerfectPosition tester</h2>';
+
+        test('hasPerfectPosition returnerar true med 4 ess i varsina högar (spel klart)', () => {
+            deck = [];
+            slots = [
+                [card('A', '♠')],
+                [card('A', '♥')],
+                [card('A', '♦')],
+                [card('A', '♣')]
+            ];
+            expect(hasPerfectPosition()).toBe(true);
+        });
+
+        test('hasPerfectPosition returnerar true även med kort kvar i plockhögen', () => {
+            deck = [card('2', '♠'), card('3', '♥')];
+            slots = [
+                [card('A', '♠')],
+                [card('A', '♥')],
+                [card('A', '♦')],
+                [card('A', '♣')]
+            ];
+            expect(hasPerfectPosition()).toBe(true);
+        });
+
+        test('hasPerfectPosition returnerar false om ett ess har kort under sig', () => {
+            deck = [];
+            slots = [
+                [card('2', '♠'), card('A', '♠')],  // Ess med kort under
+                [card('A', '♥')],
+                [card('A', '♦')],
+                [card('A', '♣')]
+            ];
+            expect(hasPerfectPosition()).toBe(false);
+        });
+
+        test('hasPerfectPosition returnerar false om inte alla ess är på plats', () => {
+            deck = [];
+            slots = [
+                [card('A', '♠')],
+                [card('K', '♥')],  // Kung istället för ess
+                [card('A', '♦')],
+                [card('A', '♣')]
+            ];
+            expect(hasPerfectPosition()).toBe(false);
+        });
+
+        test('hasPerfectPosition returnerar false med tom hög', () => {
+            deck = [];
+            slots = [
+                [card('A', '♠')],
+                [],  // Tom hög
+                [card('A', '♦')],
+                [card('A', '♣')]
+            ];
+            expect(hasPerfectPosition()).toBe(false);
+        });
+
+        // === endGame tester ===
+        resultsEl.innerHTML += '<h2>endGame tester</h2>';
+
+        test('endGame visar "Grattis, du vann!" vid perfekt vinst', () => {
+            deck = [];
+            slots = [
+                [card('A', '♠')],
+                [card('A', '♥')],
+                [card('A', '♦')],
+                [card('A', '♣')]
+            ];
+            gameOver = false;
+            endGame();
+            const statusEl = document.getElementById('status');
+            expect(statusEl.innerHTML.includes('Grattis, du vann!')).toBe(true);
+            expect(statusEl.innerHTML.includes('Poäng')).toBe(false);
+        });
+
+        test('endGame visar poäng om inte perfekt vinst', () => {
+            deck = [];
+            slots = [
+                [card('A', '♠'), card('2', '♠')],
+                [card('A', '♥')],
+                [card('A', '♦')],
+                [card('A', '♣')]
+            ];
+            gameOver = false;
+            endGame();
+            const statusEl = document.getElementById('status');
+            expect(statusEl.innerHTML.includes('Poäng: 5')).toBe(true);
+            expect(statusEl.innerHTML.includes('Grattis')).toBe(false);
+        });
+
         // Sammanfattning
         resultsEl.innerHTML += `<div class="summary"><strong>Resultat: ${passed} godkända, ${failed} misslyckade</strong></div>`;
     </script>

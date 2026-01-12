@@ -324,7 +324,12 @@ function endGame() {
     gameOver = true;
     const score = countScore();
     const statusEl = document.getElementById('status');
-    statusEl.innerHTML = `<strong>Spelet är slut! Poäng: ${score}</strong> (lägre är bättre)`;
+
+    if (score === 4) {
+        statusEl.innerHTML = '<strong>Grattis, du vann!</strong>';
+    } else {
+        statusEl.innerHTML = `<strong>Spelet är slut! Poäng: ${score}</strong> (lägre är bättre)`;
+    }
     statusEl.classList.add('game-over');
 }
 
@@ -358,11 +363,32 @@ function handleSlotClick(slotIndex) {
     }
 }
 
+// Kolla om spelaren har perfekt ställning (4 ess i varsina högar)
+function hasPerfectPosition() {
+    let acesInSinglePiles = 0;
+    for (let pile of slots) {
+        if (pile.length === 1 && pile[0].rank === 'A') {
+            acesInSinglePiles++;
+        }
+    }
+    return acesInSinglePiles === 4;
+}
+
 // Starta om spelet
 function restartGame() {
     if (!hasQuotaLeft()) {
         showQuotaExceeded();
         return;
+    }
+
+    // Varna om spelaren har perfekt ställning
+    if (hasPerfectPosition()) {
+        const message = deck.length > 0
+            ? 'Du har fyra ess i varsin hög! Vill du verkligen starta om?'
+            : 'Grattis, du vann! Vill du verkligen starta om innan du hunnit ta en screenshot som bevis?';
+        if (!confirm(message)) {
+            return;
+        }
     }
 
     gameOver = false;
