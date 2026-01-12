@@ -50,15 +50,18 @@
         <div id="greeting"></div>
         <button id="restart-btn"></button>
         <input type="checkbox" id="hints-toggle" checked>
+        <p id="quota-display"></p>
     </div>
 
     <script>
-        // Mocka prompt och localStorage
+        // Mocka prompt och localStorage med fungerande storage
         window.prompt = () => 'Test';
-        const originalLocalStorage = window.localStorage;
+        const mockStorage = {};
         window.localStorage = {
-            getItem: () => null,
-            setItem: () => { }
+            getItem: (key) => mockStorage[key] || null,
+            setItem: (key, value) => { mockStorage[key] = value; },
+            removeItem: (key) => { delete mockStorage[key]; },
+            clear: () => { Object.keys(mockStorage).forEach(k => delete mockStorage[k]); }
         };
     </script>
 
@@ -231,6 +234,71 @@
                 [card('A', '♣')]
             ];
             expect(countScore()).toBe(4);
+        });
+
+        // === Kvot-tester ===
+        resultsEl.innerHTML += '<h2>Kvot-tester</h2>';
+
+        test('getTodayKey returnerar dagens datum', () => {
+            const key = getTodayKey();
+            const today = new Date().toISOString().split('T')[0];
+            expect(key).toBe('gamesPlayed_' + today);
+        });
+
+        test('getGamesPlayedToday returnerar 0 om inget spelat', () => {
+            localStorage.clear();
+            expect(getGamesPlayedToday()).toBe(0);
+        });
+
+        test('incrementGamesPlayed ökar räknaren', () => {
+            localStorage.clear();
+            expect(getGamesPlayedToday()).toBe(0);
+            incrementGamesPlayed();
+            expect(getGamesPlayedToday()).toBe(1);
+            incrementGamesPlayed();
+            expect(getGamesPlayedToday()).toBe(2);
+        });
+
+        test('hasQuotaLeft returnerar false när kvoten är slut', () => {
+            localStorage.clear();
+            // Sätt kvoten till max
+            localStorage.setItem(getTodayKey(), DAILY_QUOTA.toString());
+            expect(hasQuotaLeft()).toBe(false);
+        });
+
+        test('hasQuotaLeft returnerar true när kvot finns kvar', () => {
+            localStorage.clear();
+            localStorage.setItem(getTodayKey(), '5');
+            expect(hasQuotaLeft()).toBe(true);
+        });
+
+        test('kvoten resettas nästa dag (olika datum-nycklar)', () => {
+            localStorage.clear();
+            // Simulera att vi spelade igår
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayKey = 'gamesPlayed_' + yesterday.toISOString().split('T')[0];
+            localStorage.setItem(yesterdayKey, DAILY_QUOTA.toString());
+
+            // Dagens kvot ska vara 0 (ny dag)
+            expect(getGamesPlayedToday()).toBe(0);
+            expect(hasQuotaLeft()).toBe(true);
+        });
+
+        test('gårdagens kvot påverkar inte dagens', () => {
+            localStorage.clear();
+            // Sätt gårdagens kvot till max
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayKey = 'gamesPlayed_' + yesterday.toISOString().split('T')[0];
+            localStorage.setItem(yesterdayKey, '10');
+
+            // Sätt dagens till 3
+            localStorage.setItem(getTodayKey(), '3');
+
+            // Ska läsa dagens värde, inte gårdagens
+            expect(getGamesPlayedToday()).toBe(3);
+            expect(hasQuotaLeft()).toBe(true);
         });
 
         // Sammanfattning
