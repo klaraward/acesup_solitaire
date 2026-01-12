@@ -262,7 +262,7 @@ function checkGameOver() {
             }
         }
 
-        if (!canRemove && findEmptySlots().length === 0) {
+        if (!canRemove) {
             endGame();
         }
     }

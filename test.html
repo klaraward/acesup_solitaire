@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Aces Up - Tester</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #eee;
+        }
+
+        .pass {
+            color: #4ade80;
+        }
+
+        .fail {
+            color: #f87171;
+        }
+
+        h2 {
+            color: #fbbf24;
+            margin-top: 30px;
+        }
+
+        .summary {
+            margin-top: 30px;
+            padding: 15px;
+            background: #2d2d44;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Aces Up - Unit Tester</h1>
+    <div id="results"></div>
+
+    <!-- Dold spelcontainer för att mocka DOM -->
+    <div style="display:none">
+        <div id="deck"></div>
+        <div id="slot-0"></div>
+        <div id="slot-1"></div>
+        <div id="slot-2"></div>
+        <div id="slot-3"></div>
+        <div id="cards-left"></div>
+        <div id="status"></div>
+        <div id="greeting"></div>
+        <button id="restart-btn"></button>
+        <input type="checkbox" id="hints-toggle" checked>
+    </div>
+
+    <script>
+        // Mocka prompt och localStorage
+        window.prompt = () => 'Test';
+        const originalLocalStorage = window.localStorage;
+        window.localStorage = {
+            getItem: () => null,
+            setItem: () => { }
+        };
+    </script>
+
+    <script src="game.js"></script>
+
+    <script>
+        const resultsEl = document.getElementById('results');
+        let passed = 0;
+        let failed = 0;
+
+        function card(rank, suit) {
+            return { rank, suit, value: rankValues[rank] };
+        }
+
+        function test(name, fn) {
+            try {
+                gameOver = false;
+                fn();
+                resultsEl.innerHTML += `<div class="pass">✓ ${name}</div>`;
+                passed++;
+            } catch (e) {
+                resultsEl.innerHTML += `<div class="fail">✗ ${name}<br>&nbsp;&nbsp;${e.message}</div>`;
+                failed++;
+            }
+        }
+
+        function expect(actual) {
+            return {
+                toBe(expected) {
+                    if (actual !== expected) {
+                        throw new Error(`Förväntade ${expected}, fick ${actual}`);
+                    }
+                }
+            };
+        }
+
+        // === checkGameOver tester ===
+        resultsEl.innerHTML += '<h2>checkGameOver tester</h2>';
+
+        test('avslutar spelet när kortlek tom, inga kort kan tas bort, inga tomma platser', () => {
+            deck = [];
+            slots = [
+                [card('A', '♠')],
+                [card('A', '♥')],
+                [card('A', '♦')],
+                [card('A', '♣')]
+            ];
+            gameOver = false;
+            checkGameOver();
+            expect(gameOver).toBe(true);
+        });
+
+        test('avslutar spelet när kortlek tom och två ess på varandra (BUGG-SCENARIO 1)', () => {
+            deck = [];
+            slots = [
+                [card('A', '♣')],  // Klöver ess ensam
+                [card('K', '♥')],  // Hjärter kung ensam
+                [card('A', '♦')],  // Ruter ess ensam
+                [card('A', '♥'), card('A', '♠')]   // Spader ess överst, hjärter ess under
+            ];
+            gameOver = false;
+            checkGameOver();
+            expect(gameOver).toBe(true);
+        });
+
+        test('avslutar spelet när kortlek tom och ess i alla högar med kort under (BUGG-SCENARIO 2)', () => {
+            deck = [];
+            slots = [
+                [card('A', '♣')],  // Klöver ess ensam
+                [card('A', '♥')],  // Hjärter ess ensam
+                [card('A', '♦')],  // Ruter ess ensam
+                [card('K', '♦'), card('K', '♣'), card('K', '♠'), card('K', '♥'), card('A', '♠')]   // Spader ess överst, alla kungar underst
+            ];
+            gameOver = false;
+            checkGameOver();
+            expect(gameOver).toBe(true);
+        });
+
+        test('avslutar INTE spelet om kort kan tas bort', () => {
+            deck = [];
+            slots = [
+                [card('A', '♠')],
+                [card('K', '♥')],  // Kan tas bort pga hjärter ess
+                [card('A', '♦')],
+                [card('A', '♥')]   // Hjärter ess synligt
+            ];
+            gameOver = false;
+            checkGameOver();
+            expect(gameOver).toBe(false);
+        });
+
+        test('avslutar INTE spelet om kortleken har kort kvar', () => {
+            deck = [card('2', '♠')];
+            slots = [
+                [card('A', '♠')],
+                [card('A', '♥')],
+                [card('A', '♦')],
+                [card('A', '♣')]
+            ];
+            gameOver = false;
+            checkGameOver();
+            expect(gameOver).toBe(false);
+        });
+
+        test('avslutar spelet även om det finns tomma platser (om inga kort kan tas bort). (Ett scenario som inte borde hända)', () => {
+            deck = [];
+            slots = [
+                [card('A', '♠')],
+                [],  // Tom plats
+                [card('A', '♦')],
+                [card('A', '♣')]
+            ];
+            gameOver = false;
+            checkGameOver();
+            expect(gameOver).toBe(true);
+        });
+
+        // === canBeRemoved tester ===
+        resultsEl.innerHTML += '<h2>canBeRemoved tester</h2>';
+
+        test('returnerar true om högre kort med samma färg finns synligt', () => {
+            slots = [
+                [card('K', '♥')],
+                [card('A', '♥')],
+                [card('5', '♦')],
+                [card('2', '♣')]
+            ];
+            expect(canBeRemoved(0)).toBe(true);
+            expect(canBeRemoved(1)).toBe(false);
+        });
+
+        test('returnerar false om högre kort är dolt under annat kort', () => {
+            slots = [
+                [card('K', '♥')],                   // Kung - kan EJ tas bort
+                [card('A', '♥'), card('A', '♠')],  // Hjärter ess dolt under spader ess
+                [card('5', '♦')],
+                [card('2', '♣')]
+            ];
+            expect(canBeRemoved(0)).toBe(false);
+        });
+
+        test('returnerar false för ess (alltid högst)', () => {
+            slots = [
+                [card('A', '♥')],
+                [card('K', '♦')],
+                [card('5', '♦')],
+                [card('2', '♣')]
+            ];
+            expect(canBeRemoved(0)).toBe(false);
+        });
+
+        // === countScore tester ===
+        resultsEl.innerHTML += '<h2>countScore tester</h2>';
+
+        test('räknar totalt antal kort i alla högar', () => {
+            slots = [
+                [card('A', '♠'), card('2', '♠')],
+                [card('A', '♥')],
+                [],
+                [card('A', '♣'), card('3', '♣'), card('4', '♣')]
+            ];
+            expect(countScore()).toBe(6);
+        });
+
+        test('returnerar 4 för perfekt vinst', () => {
+            slots = [
+                [card('A', '♠')],
+                [card('A', '♥')],
+                [card('A', '♦')],
+                [card('A', '♣')]
+            ];
+            expect(countScore()).toBe(4);
+        });
+
+        // Sammanfattning
+        resultsEl.innerHTML += `<div class="summary"><strong>Resultat: ${passed} godkända, ${failed} misslyckade</strong></div>`;
+    </script>
+</body>
+
+</html>
