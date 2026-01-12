@@ -304,7 +304,7 @@ function updateStatus() {
 // Kontrollera om spelet är slut
 function checkGameOver() {
     if (deck.length === 0) {
-        // Kolla om det finns fler drag att göra
+        // Kolla om det finns kort att ta bort
         let canRemove = false;
         for (let i = 0; i < 4; i++) {
             if (canBeRemoved(i)) {
@@ -313,7 +313,11 @@ function checkGameOver() {
             }
         }
 
-        if (!canRemove) {
+        // Kolla om man kan flytta kort (tom plats + hög med flera kort)
+        const emptySlots = findEmptySlots();
+        const canMove = emptySlots.length > 0 && slots.some(pile => pile.length > 1);
+
+        if (!canRemove && !canMove) {
             endGame();
         }
     }

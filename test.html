@@ -140,6 +140,19 @@
             expect(gameOver).toBe(true);
         });
 
+        test('avslutar INTE spelet om kort kan flyttas (BUGG-SCENARIO 3)', () => {
+            deck = [];
+            slots = [
+                [card('A', '♣')],  // Klöver ess ensam
+                [],  // tomt
+                [card('A', '♦')],  // Ruter ess ensam
+                [card('K', '♦'), card('K', '♣'), card('K', '♠'), card('K', '♥'), card('A', '♥'), card('A', '♠')]   // Spader ess överst, alla kungar underst
+            ];
+            gameOver = false;
+            checkGameOver();
+            expect(gameOver).toBe(false);
+        });
+
         test('avslutar INTE spelet om kort kan tas bort', () => {
             deck = [];
             slots = [
