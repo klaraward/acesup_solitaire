@@ -1,0 +1,225 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #1a5f2a;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 40px;
+    font-family: 'Georgia', serif;
+}
+
+.game-container {
+    text-align: center;
+}
+
+h1 {
+    color: #ffd700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    margin-bottom: 40px;
+    font-size: 2.5rem;
+}
+
+.card-slots {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 40px;
+    align-items: flex-start;
+}
+
+.card-slot {
+    width: 100px;
+    min-height: 140px;
+    border-radius: 10px;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-slot.empty {
+    border: 3px dashed rgba(255, 255, 255, 0.4);
+    background-color: rgba(0, 0, 0, 0.1);
+    justify-content: center;
+    align-items: center;
+}
+
+.card-pile {
+    position: relative;
+    width: 100px;
+}
+
+.card-pile .card {
+    position: relative;
+    margin-bottom: -110px; /* Överlappa kort, visa övre delen */
+}
+
+.card-pile .card:last-child {
+    margin-bottom: 0;
+}
+
+.card-pile .card.stacked {
+    pointer-events: none; /* Kan inte klicka på underkort */
+    opacity: 0.9;
+}
+
+.deck-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.deck {
+    position: relative;
+    width: 100px;
+    height: 140px;
+    cursor: pointer;
+}
+
+.deck-info {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+}
+
+.card {
+    width: 100px;
+    height: 140px;
+    border-radius: 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.card.back {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #1e3a5f 100%);
+    border: 2px solid #fff;
+}
+
+.card.back::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+}
+
+.card.front {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 8px;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.card .corner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+}
+
+.card .corner.bottom {
+    align-self: flex-end;
+    transform: rotate(180deg);
+}
+
+.card .rank {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.card .suit {
+    font-size: 1rem;
+}
+
+.card.red {
+    color: #d32f2f;
+}
+
+.card.black {
+    color: #212121;
+}
+
+.card .center-suit {
+    font-size: 2.5rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Stacked deck effect */
+.deck .card:nth-child(1) { top: 0; left: 0; }
+.deck .card:nth-child(2) { top: 1px; left: 1px; }
+.deck .card:nth-child(3) { top: 2px; left: 2px; }
+.deck .card:nth-child(4) { top: 3px; left: 3px; }
+.deck .card:nth-child(5) { top: 4px; left: 4px; }
+
+/* Kort som kan tas bort */
+.card.removable {
+    box-shadow: 0 0 15px 5px rgba(255, 100, 100, 0.7);
+    cursor: pointer;
+}
+
+.card.removable:hover {
+    transform: scale(1.05);
+}
+
+/* Valt kort för flytt */
+.card.selected {
+    box-shadow: 0 0 15px 5px rgba(100, 200, 255, 0.8);
+    transform: translateY(-5px);
+}
+
+
+/* Kontroller */
+.controls {
+    color: white;
+}
+
+#status {
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    min-height: 1.5em;
+}
+
+#status.game-over {
+    color: #ffd700;
+    font-size: 1.3rem;
+}
+
+#restart-btn {
+    padding: 10px 25px;
+    font-size: 1rem;
+    background-color: #c0392b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background-color 0.2s;
+}
+
+#restart-btn:hover {
+    background-color: #e74c3c;
+}
+
+/* Tom plats när ett kort är valt */
+.card-slot.empty:hover {
+    background-color: rgba(100, 200, 255, 0.2);
+    border-color: rgba(100, 200, 255, 0.8);
+}

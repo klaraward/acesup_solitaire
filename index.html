@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aces High - Patiensspel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>Aces High</h1>
+
+        <div class="card-slots">
+            <div class="card-slot empty" id="slot-0"></div>
+            <div class="card-slot empty" id="slot-1"></div>
+            <div class="card-slot empty" id="slot-2"></div>
+            <div class="card-slot empty" id="slot-3"></div>
+        </div>
+
+        <div class="deck-area">
+            <div class="deck" id="deck">
+                <div class="card back"></div>
+            </div>
+            <div class="deck-info">
+                <span id="cards-left">52</span> kort kvar
+            </div>
+        </div>
+
+        <div class="controls">
+            <p id="status">Klicka på kortleken för att dela ut kort</p>
+            <button id="restart-btn">Starta om</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
