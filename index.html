@@ -36,6 +36,7 @@
             </div>
             <button id="restart-btn">Starta om</button>
             <p id="quota-display" class="quota-info"></p>
+            <p id="player-count" class="player-count"></p>
         </div>
     </div>
 
@@ -50,6 +51,34 @@
         </ul>
     </div>
 
-    <script src="game.js"></script>
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getDatabase, ref, get, set, runTransaction } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDBkytOXLGPAo83ZaZBvKJIpz0MYFo3C98",
+        authDomain: "acesup-solitaire.firebaseapp.com",
+        databaseURL: "https://acesup-solitaire-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "acesup-solitaire",
+        storageBucket: "acesup-solitaire.firebasestorage.app",
+        messagingSenderId: "927831514290",
+        appId: "1:927831514290:web:58f4d2f49c132c5ae83dab"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Gör Firebase-funktioner tillgängliga globalt
+    window.firebaseDb = db;
+    window.firebaseRef = ref;
+    window.firebaseRunTransaction = runTransaction;
+    window.firebaseGet = get;
+
+    // Kör spelarräkning efter Firebase är redo
+    if (typeof registerPlayerWithFirebase === 'function') {
+        registerPlayerWithFirebase();
+    }
+</script>
+<script src="game.js"></script>
 </body>
 </html>

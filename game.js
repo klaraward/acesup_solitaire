@@ -16,6 +16,65 @@ let hintsEnabled = true;
 const DAILY_QUOTA = 10;
 const UNLIMITED_PARAM = 'unlimited';
 
+// Räknare för unika spelare idag
+function getTodayDateString() {
+    return new Date().toISOString().split('T')[0];
+}
+
+function getVisitKey() {
+    return 'visitedToday_' + getTodayDateString();
+}
+
+function hasVisitedToday() {
+    return localStorage.getItem(getVisitKey()) === 'true';
+}
+
+function markVisitedToday() {
+    localStorage.setItem(getVisitKey(), 'true');
+}
+
+function updatePlayerCountDisplay(count) {
+    const el = document.getElementById('player-count');
+    if (!el) return;
+
+    if (count === null || count === undefined) {
+        el.textContent = '';
+    } else if (count === 1) {
+        el.textContent = 'Du är första spelaren idag!';
+    } else {
+        el.textContent = `${count} spelare idag`;
+    }
+}
+
+async function registerPlayerWithFirebase() {
+    if (!window.firebaseDb) {
+        // Firebase inte laddat än, vänta
+        setTimeout(registerPlayerWithFirebase, 100);
+        return;
+    }
+
+    const today = getTodayDateString();
+    const countRef = window.firebaseRef(window.firebaseDb, `dailyPlayers/${today}`);
+
+    try {
+        if (!hasVisitedToday()) {
+            // Ny spelare - öka räknaren med transaktion
+            await window.firebaseRunTransaction(countRef, (currentCount) => {
+                return (currentCount || 0) + 1;
+            });
+            markVisitedToday();
+        }
+
+        // Hämta aktuellt antal
+        const snapshot = await window.firebaseGet(countRef);
+        const count = snapshot.val() || 0;
+        updatePlayerCountDisplay(count);
+    } catch (error) {
+        console.error('Firebase-fel:', error);
+        updatePlayerCountDisplay(null);
+    }
+}
+
 function isUnlimitedMode() {
     const params = new URLSearchParams(window.location.search);
     return params.has(UNLIMITED_PARAM);
@@ -424,6 +483,7 @@ document.getElementById('hints-toggle').addEventListener('change', (e) => {
 // Initiera spelet
 function initGame() {
     updateQuotaDisplay();
+    registerPlayerWithFirebase();
 
     if (!hasQuotaLeft()) {
         showQuotaExceeded();
