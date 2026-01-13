@@ -33,6 +33,16 @@ function markVisitedToday() {
     localStorage.setItem(getVisitKey(), 'true');
 }
 
+// UUID-hantering
+function getOrCreatePlayerId() {
+    let playerId = localStorage.getItem('playerId');
+    if (!playerId) {
+        playerId = crypto.randomUUID();
+        localStorage.setItem('playerId', playerId);
+    }
+    return playerId;
+}
+
 function updatePlayerCountDisplay(count) {
     const el = document.getElementById('player-count');
     if (!el) return;
@@ -55,6 +65,7 @@ async function registerPlayerWithFirebase() {
 
     const today = getTodayDateString();
     const countRef = window.firebaseRef(window.firebaseDb, `dailyPlayers/${today}`);
+    const playerId = getOrCreatePlayerId();
 
     try {
         if (!hasVisitedToday()) {
@@ -63,6 +74,20 @@ async function registerPlayerWithFirebase() {
                 return (currentCount || 0) + 1;
             });
             markVisitedToday();
+
+            // Spara spelarens UUID i Firebase
+            const playerRef = window.firebaseRef(window.firebaseDb, `players/${playerId}`);
+            const timestamp = new Date().toISOString();
+            await window.firebaseRunTransaction(playerRef, (playerData) => {
+                if (!playerData) {
+                    return { firstVisit: timestamp, lastVisit: timestamp, visitCount: 1 };
+                }
+                return {
+                    ...playerData,
+                    lastVisit: timestamp,
+                    visitCount: (playerData.visitCount || 0) + 1
+                };
+            });
         }
 
         // Hämta aktuellt antal
