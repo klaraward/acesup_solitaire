@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="sv">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aces Up - Patiensspel</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="game-container">
         <h1>Aces Up</h1>
@@ -48,39 +50,44 @@
         <h2>Så spelar du</h2>
         <ul>
             <li>Klicka på kortleken för att dela ut fyra kort</li>
-            <li>Klicka på ett kort för att ta bort det om ett annat kort med samma färg (hjärter, ruter, klöver, spader) har högre värde</li>
+            <li>Klicka på ett kort för att ta bort det om ett annat kort med samma färg (hjärter, ruter, klöver, spader)
+                har högre värde</li>
             <li>Ess är högst och kan aldrig tas bort</li>
             <li>Flytta kort till tomma platser genom att klicka på kortet och sedan den tomma platsen</li>
             <li>Målet är att bara ha de fyra essen kvar</li>
         </ul>
     </div>
 
+    <p class="github-link"><a href="https://github.com/klaraward/acesup_solitaire" target="_blank">Koden är skriven av
+            Claude Code på uppdrag av Klara och finns på GitHub</a></p>
+
     <script src="game.js"></script>
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-    import { getDatabase, ref, get, set, runTransaction } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+        import { getDatabase, ref, get, set, runTransaction } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyDBkytOXLGPAo83ZaZBvKJIpz0MYFo3C98",
-        authDomain: "acesup-solitaire.firebaseapp.com",
-        databaseURL: "https://acesup-solitaire-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "acesup-solitaire",
-        storageBucket: "acesup-solitaire.firebasestorage.app",
-        messagingSenderId: "927831514290",
-        appId: "1:927831514290:web:58f4d2f49c132c5ae83dab"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyDBkytOXLGPAo83ZaZBvKJIpz0MYFo3C98",
+            authDomain: "acesup-solitaire.firebaseapp.com",
+            databaseURL: "https://acesup-solitaire-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "acesup-solitaire",
+            storageBucket: "acesup-solitaire.firebasestorage.app",
+            messagingSenderId: "927831514290",
+            appId: "1:927831514290:web:58f4d2f49c132c5ae83dab"
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-    // Gör Firebase-funktioner tillgängliga globalt
-    window.firebaseDb = db;
-    window.firebaseRef = ref;
-    window.firebaseRunTransaction = runTransaction;
-    window.firebaseGet = get;
+        // Gör Firebase-funktioner tillgängliga globalt
+        window.firebaseDb = db;
+        window.firebaseRef = ref;
+        window.firebaseRunTransaction = runTransaction;
+        window.firebaseGet = get;
 
-    // Kör spelarräkning nu när Firebase är redo
-    registerPlayerWithFirebase();
-</script>
+        // Kör spelarräkning nu när Firebase är redo
+        registerPlayerWithFirebase();
+    </script>
 </body>
+
 </html>

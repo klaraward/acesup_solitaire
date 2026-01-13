@@ -259,6 +259,21 @@ h1 {
     opacity: 0.6;
 }
 
+.github-link {
+    margin-top: 8px;
+    font-size: 0.85rem;
+}
+
+.github-link a {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+}
+
+.github-link a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
 /* Tom plats när ett kort är valt */
 .card-slot.empty:hover {
     background-color: rgba(100, 200, 255, 0.2);
