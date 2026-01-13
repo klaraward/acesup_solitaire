@@ -51,7 +51,8 @@
         </ul>
     </div>
 
-    <script type="module">
+    <script src="game.js"></script>
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
     import { getDatabase, ref, get, set, runTransaction } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
 
@@ -74,11 +75,8 @@
     window.firebaseRunTransaction = runTransaction;
     window.firebaseGet = get;
 
-    // Kör spelarräkning efter Firebase är redo
-    if (typeof registerPlayerWithFirebase === 'function') {
-        registerPlayerWithFirebase();
-    }
+    // Kör spelarräkning nu när Firebase är redo
+    registerPlayerWithFirebase();
 </script>
-<script src="game.js"></script>
 </body>
 </html>
