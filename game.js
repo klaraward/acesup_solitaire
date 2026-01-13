@@ -10,7 +10,7 @@ let deck = [];
 let slots = [[], [], [], []]; // Varje slot är nu en hög med kort
 let selectedSlot = null;
 let gameOver = false;
-let hintsEnabled = true;
+let hintMode = 'show'; // 'off', 'exists', 'show'
 
 // Kvot-hantering
 const DAILY_QUOTA = 10;
@@ -238,8 +238,8 @@ function renderSlots() {
                         cardEl.classList.add('selected');
                     }
 
-                    // Markera kort som kan tas bort (endast översta, om hints är på)
-                    if (hintsEnabled && canBeRemoved(i)) {
+                    // Markera kort som kan tas bort (endast översta, om hints är på 'show')
+                    if (hintMode === 'show' && canBeRemoved(i)) {
                         cardEl.classList.add('removable');
                     }
                 }
@@ -301,6 +301,7 @@ function removeCard(slotIndex) {
         slots[slotIndex].pop();
         renderSlots();
         updateStatus();
+        updateHintIndicator();
         checkGameOver();
     }
 }
@@ -324,6 +325,7 @@ function moveCard(fromSlot, toSlot) {
         selectedSlot = null;
         renderSlots();
         updateStatus();
+        updateHintIndicator();
     }
 }
 
@@ -345,6 +347,7 @@ function dealCards() {
     renderDeck();
     renderSlots();
     updateStatus();
+    updateHintIndicator();
     checkGameOver();
 }
 
@@ -500,10 +503,35 @@ for (let i = 0; i < 4; i++) {
 
 document.getElementById('restart-btn').addEventListener('click', restartGame);
 
-document.getElementById('hints-toggle').addEventListener('change', (e) => {
-    hintsEnabled = e.target.checked;
+document.getElementById('hints-mode').addEventListener('change', (e) => {
+    hintMode = e.target.value;
     renderSlots();
+    updateHintIndicator();
 });
+
+// Uppdatera hint-indikator för 'exists'-läge
+function updateHintIndicator() {
+    const deckEl = document.getElementById('deck');
+
+    if (hintMode !== 'exists' || gameOver) {
+        deckEl.classList.remove('has-moves');
+        return;
+    }
+
+    let hasRemovableCard = false;
+    for (let i = 0; i < 4; i++) {
+        if (canBeRemoved(i)) {
+            hasRemovableCard = true;
+            break;
+        }
+    }
+
+    if (hasRemovableCard) {
+        deckEl.classList.add('has-moves');
+    } else {
+        deckEl.classList.remove('has-moves');
+    }
+}
 
 // Initiera spelet
 function initGame() {
@@ -520,6 +548,7 @@ function initGame() {
     renderDeck();
     renderSlots();
     updateStatus();
+    updateHintIndicator();
 }
 
 initGame();
