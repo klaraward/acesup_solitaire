@@ -30,8 +30,12 @@
             <p id="status">Klicka på kortleken för att dela ut kort</p>
             <div class="options">
                 <label>
-                    <input type="checkbox" id="hints-toggle" checked>
-                    Visa hints
+                    Hints:
+                    <select id="hints-mode">
+                        <option value="off">Av</option>
+                        <option value="exists">Finns drag</option>
+                        <option value="show" selected>Visa kort</option>
+                    </select>
                 </label>
             </div>
             <button id="restart-btn">Starta om</button>
