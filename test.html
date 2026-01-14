@@ -49,8 +49,12 @@
         <div id="status"></div>
         <div id="greeting"></div>
         <button id="restart-btn"></button>
-        <input type="checkbox" id="hints-toggle" checked>
+        <input type="radio" name="hints-mode" value="off">
+        <input type="radio" name="hints-mode" value="exists">
+        <input type="radio" name="hints-mode" value="show" checked>
+        <input type="checkbox" id="colorful-suits">
         <p id="quota-display"></p>
+        <p id="player-count"></p>
     </div>
 
     <script>
@@ -403,6 +407,90 @@
             const statusEl = document.getElementById('status');
             expect(statusEl.innerHTML.includes('Poäng: 5')).toBe(true);
             expect(statusEl.innerHTML.includes('Grattis')).toBe(false);
+        });
+
+        // === canRemoveAfterExposing tester (dubbelklick) ===
+        resultsEl.innerHTML += '<h2>canRemoveAfterExposing tester (dubbelklick)</h2>';
+
+        test('canRemoveAfterExposing returnerar true om översta kortet är lägre än underkortet och samma svit', () => {
+            slots = [
+                [card('A', '♥'), card('K', '♥')],  // Kung på ess, samma svit - kan tas bort
+                [card('5', '♦')],
+                [card('2', '♣')],
+                []
+            ];
+            expect(canRemoveAfterExposing(0)).toBe(true);
+        });
+
+        test('canRemoveAfterExposing returnerar false om översta kortet är högre än underkortet', () => {
+            slots = [
+                [card('K', '♥'), card('A', '♥')],  // Ess på kung - kan EJ tas bort (ess är högst)
+                [card('5', '♦')],
+                [card('2', '♣')],
+                []
+            ];
+            expect(canRemoveAfterExposing(0)).toBe(false);
+        });
+
+        test('canRemoveAfterExposing returnerar false om korten har olika svit', () => {
+            slots = [
+                [card('A', '♥'), card('K', '♠')],  // Kung spader på ess hjärter - olika svit
+                [card('5', '♦')],
+                [card('2', '♣')],
+                []
+            ];
+            expect(canRemoveAfterExposing(0)).toBe(false);
+        });
+
+        test('canRemoveAfterExposing returnerar false om högen bara har ett kort', () => {
+            slots = [
+                [card('K', '♥')],  // Bara ett kort
+                [card('5', '♦')],
+                [card('2', '♣')],
+                []
+            ];
+            expect(canRemoveAfterExposing(0)).toBe(false);
+        });
+
+        test('canRemoveAfterExposing returnerar false för tom hög', () => {
+            slots = [
+                [],
+                [card('5', '♦')],
+                [card('2', '♣')],
+                [card('A', '♥')]
+            ];
+            expect(canRemoveAfterExposing(0)).toBe(false);
+        });
+
+        test('handleSlotDoubleClick tar bort kort om tom plats finns och villkor uppfylls', () => {
+            deck = [];
+            slots = [
+                [card('A', '♥'), card('K', '♥')],  // Kung på ess, samma svit
+                [card('5', '♦')],
+                [card('2', '♣')],
+                []  // Tom plats
+            ];
+            gameOver = false;
+            handleSlotDoubleClick(0);
+            // Kungen ska vara borta, bara esset kvar
+            expect(slots[0].length).toBe(1);
+            expect(slots[0][0].rank).toBe('A');
+            // Tomma platsen ska fortfarande vara tom (kortet togs bort direkt)
+            expect(slots[3].length).toBe(0);
+        });
+
+        test('handleSlotDoubleClick gör inget om ingen tom plats finns', () => {
+            deck = [];
+            slots = [
+                [card('A', '♥'), card('K', '♥')],  // Kung på ess, samma svit
+                [card('5', '♦')],
+                [card('2', '♣')],
+                [card('3', '♠')]  // Ingen tom plats
+            ];
+            gameOver = false;
+            handleSlotDoubleClick(0);
+            // Inget ska ha ändrats
+            expect(slots[0].length).toBe(2);
         });
 
         // Sammanfattning
