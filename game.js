@@ -10,8 +10,8 @@ let deck = [];
 let slots = [[], [], [], []]; // Varje slot är nu en hög med kort
 let selectedSlot = null;
 let gameOver = false;
-let hintMode = 'show'; // 'off', 'exists', 'show'
-let colorfulSuits = false;
+let hintMode = localStorage.getItem('hintMode') || 'show'; // 'off', 'exists', 'show'
+let colorfulSuits = localStorage.getItem('colorfulSuits') === 'true';
 
 // Kvot-hantering
 const DAILY_QUOTA = 10;
@@ -520,6 +520,7 @@ document.getElementById('restart-btn').addEventListener('click', restartGame);
 document.querySelectorAll('input[name="hints-mode"]').forEach(radio => {
     radio.addEventListener('change', (e) => {
         hintMode = e.target.value;
+        localStorage.setItem('hintMode', hintMode);
         renderSlots();
         updateHintIndicator();
     });
@@ -527,8 +528,21 @@ document.querySelectorAll('input[name="hints-mode"]').forEach(radio => {
 
 document.getElementById('colorful-suits').addEventListener('change', (e) => {
     colorfulSuits = e.target.checked;
+    localStorage.setItem('colorfulSuits', colorfulSuits);
     renderSlots();
 });
+
+// Återställ sparade inställningar i UI
+function restoreSettings() {
+    // Hints
+    const hintRadio = document.querySelector(`input[name="hints-mode"][value="${hintMode}"]`);
+    if (hintRadio) hintRadio.checked = true;
+
+    // Färgglada sviter
+    document.getElementById('colorful-suits').checked = colorfulSuits;
+}
+
+restoreSettings();
 
 // Uppdatera hint-indikator för 'exists'-läge
 function updateHintIndicator() {
