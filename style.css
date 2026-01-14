@@ -154,6 +154,23 @@ h1 {
     color: #212121;
 }
 
+/* Färgglada sviter */
+.card.suit-hearts {
+    color: #d32f2f;
+}
+
+.card.suit-diamonds {
+    color: #f9a825;
+}
+
+.card.suit-spades {
+    color: #1976d2;
+}
+
+.card.suit-clubs {
+    color: #388e3c;
+}
+
 .card .center-suit {
     font-size: 2.5rem;
     position: absolute;
@@ -202,10 +219,26 @@ h1 {
     gap: 6px;
 }
 
-.options select {
-    padding: 4px 8px;
+.hints-fieldset {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+}
+
+.hints-fieldset legend {
+    padding: 0 6px;
     font-size: 0.9rem;
-    border-radius: 4px;
+}
+
+.hints-fieldset label {
+    margin-right: 12px;
+}
+
+.options input[type="radio"],
+.options input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
     cursor: pointer;
 }
 

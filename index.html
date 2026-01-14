@@ -31,13 +31,24 @@
         <div class="controls">
             <p id="status">Klicka på kortleken för att dela ut kort</p>
             <div class="options">
+                <fieldset class="hints-fieldset">
+                    <legend>Hints:</legend>
+                    <label>
+                        <input type="radio" name="hints-mode" value="off">
+                        Av
+                    </label>
+                    <label>
+                        <input type="radio" name="hints-mode" value="exists">
+                        Finns drag
+                    </label>
+                    <label>
+                        <input type="radio" name="hints-mode" value="show" checked>
+                        Visa kort
+                    </label>
+                </fieldset>
                 <label>
-                    Hints:
-                    <select id="hints-mode">
-                        <option value="off">Av</option>
-                        <option value="exists">Finns drag</option>
-                        <option value="show" selected>Visa kort</option>
-                    </select>
+                    <input type="checkbox" id="colorful-suits">
+                    Färgglada sviter
                 </label>
             </div>
             <button id="restart-btn">Starta om</button>

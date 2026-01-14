@@ -11,6 +11,7 @@ let slots = [[], [], [], []]; // Varje slot är nu en hög med kort
 let selectedSlot = null;
 let gameOver = false;
 let hintMode = 'show'; // 'off', 'exists', 'show'
+let colorfulSuits = false;
 
 // Kvot-hantering
 const DAILY_QUOTA = 10;
@@ -171,10 +172,23 @@ function isRed(suit) {
     return suit === '♥' || suit === '♦';
 }
 
+// Hämta CSS-klass för svit
+function getSuitColorClass(suit) {
+    if (colorfulSuits) {
+        switch (suit) {
+            case '♥': return 'suit-hearts';
+            case '♦': return 'suit-diamonds';
+            case '♠': return 'suit-spades';
+            case '♣': return 'suit-clubs';
+        }
+    }
+    return isRed(suit) ? 'red' : 'black';
+}
+
 // Skapa HTML för ett kort
 function createCardElement(card, slotIndex) {
     const div = document.createElement('div');
-    div.className = `card front ${isRed(card.suit) ? 'red' : 'black'}`;
+    div.className = `card front ${getSuitColorClass(card.suit)}`;
     div.innerHTML = `
         <div class="corner top">
             <span class="rank">${card.rank}</span>
@@ -503,10 +517,17 @@ for (let i = 0; i < 4; i++) {
 
 document.getElementById('restart-btn').addEventListener('click', restartGame);
 
-document.getElementById('hints-mode').addEventListener('change', (e) => {
-    hintMode = e.target.value;
+document.querySelectorAll('input[name="hints-mode"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+        hintMode = e.target.value;
+        renderSlots();
+        updateHintIndicator();
+    });
+});
+
+document.getElementById('colorful-suits').addEventListener('change', (e) => {
+    colorfulSuits = e.target.checked;
     renderSlots();
-    updateHintIndicator();
 });
 
 // Uppdatera hint-indikator för 'exists'-läge
