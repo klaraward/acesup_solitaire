@@ -468,6 +468,46 @@ function handleSlotClick(slotIndex) {
     }
 }
 
+// Kolla om översta kortet kan tas bort efter att underkortet exponeras
+function canRemoveAfterExposing(slotIndex) {
+    const pile = slots[slotIndex];
+    if (pile.length < 2) return false;
+
+    const topCard = pile[pile.length - 1];
+    const secondCard = pile[pile.length - 2];
+
+    // Kolla om översta kortet är lägre än underkortet och samma svit
+    if (topCard.suit === secondCard.suit && topCard.value < secondCard.value) {
+        return true;
+    }
+    return false;
+}
+
+// Hantera dubbelklick - genväg för att flytta och ta bort
+function handleSlotDoubleClick(slotIndex) {
+    if (gameOver) return;
+
+    // Enkelklicket har redan valt kortet, så avmarkera först
+    selectedSlot = null;
+
+    // Kolla om det finns tomma platser (exklusive om vi precis flyttade dit)
+    const emptySlots = findEmptySlots();
+    if (emptySlots.length === 0) return;
+
+    const pile = slots[slotIndex];
+    if (pile.length < 2) return;
+
+    if (canRemoveAfterExposing(slotIndex)) {
+        // Ta bort översta kortet direkt (det ligger på ett högre kort av samma svit)
+        pile.pop();
+
+        renderSlots();
+        updateStatus();
+        updateHintIndicator();
+        checkGameOver();
+    }
+}
+
 // Kolla om spelaren har perfekt ställning (4 ess i varsina högar)
 function hasPerfectPosition() {
     let acesInSinglePiles = 0;
@@ -511,8 +551,29 @@ function restartGame() {
 // Event listeners
 document.getElementById('deck').addEventListener('click', dealCards);
 
+const DOUBLE_CLICK_THRESHOLD = 300; // ms
+let lastClickTime = {};
+let lastClickSlot = null;
+
 for (let i = 0; i < 4; i++) {
-    document.getElementById(`slot-${i}`).addEventListener('click', () => handleSlotClick(i));
+    document.getElementById(`slot-${i}`).addEventListener('click', () => {
+        const now = Date.now();
+        const timeSinceLastClick = now - (lastClickTime[i] || 0);
+
+        if (lastClickSlot === i && timeSinceLastClick < DOUBLE_CLICK_THRESHOLD) {
+            // Dubbelklick - försök ta bort kort via genvägen
+            if (canRemoveAfterExposing(i) && findEmptySlots().length > 0) {
+                selectedSlot = null;
+                handleSlotDoubleClick(i);
+                lastClickTime[i] = 0; // Återställ så nästa klick inte blir dubbelklick
+                return;
+            }
+        }
+
+        lastClickTime[i] = now;
+        lastClickSlot = i;
+        handleSlotClick(i);
+    });
 }
 
 document.getElementById('restart-btn').addEventListener('click', restartGame);
