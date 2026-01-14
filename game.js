@@ -536,7 +536,6 @@ function updateHintIndicator() {
 // Initiera spelet
 function initGame() {
     updateQuotaDisplay();
-    registerPlayerWithFirebase();
 
     if (!hasQuotaLeft()) {
         showQuotaExceeded();
